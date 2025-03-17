@@ -27,18 +27,18 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('docker.containers') }}">
+                        <a class="nav-link" href="{{ url_for('docker_api.containers') }}">
                             <i class="bi bi-box me-1"></i>Containers
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('docker.images') }}">
+                        <a class="nav-link" href="{{ url_for('docker_api.images') }}">
                             <i class="bi bi-layers me-1"></i>Images
                         </a>
                     </li>
                     {% if current_user.is_admin %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('docker.create_container') }}">
+                        <a class="nav-link" href="{{ url_for('docker_api.create_container') }}">
                             <i class="bi bi-plus-circle me-1"></i>Create Container
                         </a>
                     </li>

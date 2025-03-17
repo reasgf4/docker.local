@@ -57,8 +57,12 @@ def create_app(test_config=None):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    from app.docker_api import bp as docker_bp
-    app.register_blueprint(docker_bp)
+    # Register docker blueprint only if it's not already registered
+    # Use a more reliable method to check for blueprint registration
+    registered_blueprints = [bp.name for bp in app.blueprints.values()]
+    if 'docker' not in registered_blueprints:
+        from app.docker_api import bp as docker_bp
+        app.register_blueprint(docker_bp)
 
     # Add context processor for templates
     @app.context_processor
