@@ -43,19 +43,22 @@ A web-based interface for managing Docker containers, designed for 10-15 users.
 
 5. Initialize the database:
    ```
-   flask db init
-   flask db migrate
-   flask db upgrade
+   python init_db.py
    ```
 
-6. Create an admin user:
+   Alternatively, you can create an admin user manually:
    ```
-   flask create-admin
+   python create_admin.py
    ```
 
 ## Running the Application
 
 Start the application:
+```
+python run.py
+```
+
+Or using Flask:
 ```
 flask run
 ```
@@ -71,6 +74,11 @@ You can also run this application in Docker:
 ```
 docker build -t docker-web-interface .
 docker run -p 5000:5000 -v /var/run/docker.sock:/var/run/docker.sock docker-web-interface
+```
+
+Or using Docker Compose:
+```
+docker-compose up -d
 ```
 
 ## Security Considerations
