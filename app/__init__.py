@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -54,6 +55,11 @@ def create_app(test_config=None):
 
     from app.docker_api import bp as docker_bp
     app.register_blueprint(docker_bp)
+
+    # Add context processor for templates
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.utcnow()}
 
     # Shell context processor
     @app.shell_context_processor
