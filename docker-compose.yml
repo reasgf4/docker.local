@@ -6,13 +6,19 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      # For Linux/macOS:
+      # - /var/run/docker.sock:/var/run/docker.sock
+      # For Windows:
+      - //./pipe/docker_engine://./pipe/docker_engine
     environment:
       - SECRET_KEY=change_this_to_a_secure_random_string
       - FLASK_APP=app
       - FLASK_ENV=production
       - DATABASE_URI=sqlite:///app.db
-      - DOCKER_HOST=unix:///var/run/docker.sock
+      # For Linux/macOS:
+      # - DOCKER_HOST=unix:///var/run/docker.sock
+      # For Windows:
+      - DOCKER_HOST=npipe:////./pipe/docker_engine
     restart: unless-stopped
     user: root  # Required to access Docker socket
     networks:

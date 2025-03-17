@@ -1,4 +1,5 @@
 import os
+import platform
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -20,12 +21,15 @@ def create_app(test_config=None):
     # Create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     
+    # Set default Docker host based on platform
+    default_docker_host = 'npipe:////./pipe/docker_engine' if platform.system() == 'Windows' else 'unix:///var/run/docker.sock'
+    
     # Set default configuration
     app.config.from_mapping(
         SECRET_KEY=os.environ.get('SECRET_KEY', 'dev'),
         SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URI', 'sqlite:///app.db'),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        DOCKER_HOST=os.environ.get('DOCKER_HOST', 'unix:///var/run/docker.sock')
+        DOCKER_HOST=os.environ.get('DOCKER_HOST', default_docker_host)
     )
 
     if test_config is None:
