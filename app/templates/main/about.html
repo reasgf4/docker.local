@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="bi bi-info-circle me-2"></i>About Docker Container Manager</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5>Docker Container Management Web Interface</h5>
+                        <p>
+                            This application provides a user-friendly web interface for managing Docker containers.
+                            It is designed for small teams of 10-15 users who need to manage Docker containers
+                            without having to use the command line.
+                        </p>
+                        
+                        <h5 class="mt-4">Features</h5>
+                        <ul>
+                            <li>User authentication and authorization</li>
+                            <li>Start, stop, restart, and remove Docker containers</li>
+                            <li>View container logs and statistics</li>
+                            <li>User-friendly dashboard with real-time updates</li>
+                            <li>Multi-user support with different permission levels</li>
+                        </ul>
+                        
+                        <h5 class="mt-4">Technology Stack</h5>
+                        <ul>
+                            <li>Backend: Flask (Python)</li>
+                            <li>Frontend: Bootstrap 5, Chart.js</li>
+                            <li>Database: SQLAlchemy with SQLite</li>
+                            <li>Docker SDK for Python</li>
+                        </ul>
+                        
+                        <h5 class="mt-4">Security Considerations</h5>
+                        <p>
+                            This application requires access to the Docker socket, which has security implications.
+                            It is recommended to:
+                        </p>
+                        <ul>
+                            <li>Use HTTPS in production</li>
+                            <li>Implement proper user authentication and authorization</li>
+                            <li>Regularly update dependencies</li>
+                            <li>Restrict access to the Docker socket</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="mb-0"><i class="bi bi-boxes me-2"></i>Docker</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png" alt="Docker Logo" class="img-fluid mb-3" style="max-width: 200px;">
+                                <p>
+                                    Docker is a platform for developing, shipping, and running applications in containers.
+                                </p>
+                                <a href="https://www.docker.com/" target="_blank" class="btn btn-outline-primary">Learn More</a>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="bi bi-flask me-2"></i>Flask</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="https://flask.palletsprojects.com/en/2.3.x/_images/flask-logo.png" alt="Flask Logo" class="img-fluid mb-3" style="max-width: 200px;">
+                                <p>
+                                    Flask is a lightweight WSGI web application framework in Python.
+                                </p>
+                                <a href="https://flask.palletsprojects.com/" target="_blank" class="btn btn-outline-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <p class="mb-0">Docker Container Manager &copy; 2023 | <a href="https://github.com/" target="_blank">GitHub</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

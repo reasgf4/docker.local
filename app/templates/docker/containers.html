@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-box me-2"></i>Containers</h4>
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('docker.create_container') }}" class="btn btn-light btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i>Create Container
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Image</th>
+                                <th>Status</th>
+                                <th>Ports</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for container in containers %}
+                            <tr>
+                                <td>{{ container.short_id }}</td>
+                                <td>
+                                    <a href="{{ url_for('docker.container_detail', container_id=container.id) }}">
+                                        {{ container.name }}
+                                    </a>
+                                </td>
+                                <td>{{ container.image.tags[0] if container.image.tags else container.image.short_id }}</td>
+                                <td>
+                                    <span class="badge {% if container.status == 'running' %}bg-success{% elif container.status == 'paused' %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ container.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if container.ports %}
+                                        {% for port, mappings in container.ports.items() %}
+                                            {% if mappings %}
+                                                {% for mapping in mappings %}
+                                                    {{ mapping['HostIp'] or '0.0.0.0' }}:{{ mapping['HostPort'] }} -> {{ port }}<br>
+                                                {% endfor %}
+                                            {% else %}
+                                                {{ port }}<br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ container.attrs.Created.split('T')[0] }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        {% if container.status == 'running' %}
+                                        <form method="POST" action="{{ url_for('docker.stop_container', container_id=container.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-danger" title="Stop">
+                                                <i class="bi bi-stop-circle"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('docker.restart_container', container_id=container.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-warning" title="Restart">
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <form method="POST" action="{{ url_for('docker.start_container', container_id=container.id) }}" class="d-inline">
+                                            <button type="submit" class="btn btn-outline-success" title="Start">
+                                                <i class="bi bi-play-circle"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                        <a href="{{ url_for('docker.container_logs', container_id=container.id) }}" class="btn btn-outline-info" title="Logs">
+                                            <i class="bi bi-journal-text"></i>
+                                        </a>
+                                        {% if current_user.is_admin %}
+                                        <form method="POST" action="{{ url_for('docker.remove_container', container_id=container.id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this container?');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Remove">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center">No containers found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Total: {{ containers|length }} container(s)</span>
+                    <button id="refreshBtn" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+        window.location.reload();
+    });
+});
+</script>
+{% endblock %} 

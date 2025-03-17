@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-journal-text me-2"></i>Logs: {{ container.name }}
+                    <span class="badge {% if container.status == 'running' %}bg-success{% elif container.status == 'paused' %}bg-warning{% else %}bg-danger{% endif %} ms-2">
+                        {{ container.status }}
+                    </span>
+                </h4>
+                <div>
+                    <a href="{{ url_for('docker.container_detail', container_id=container.id) }}" class="btn btn-light btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Container
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <button id="refreshLogsBtn" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                            </button>
+                            <button id="scrollToBottomBtn" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-arrow-down me-1"></i>Scroll to Bottom
+                            </button>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="autoRefreshSwitch">
+                            <label class="form-check-label" for="autoRefreshSwitch">Auto-refresh (5s)</label>
+                        </div>
+                    </div>
+                    <div class="logs-container bg-dark text-light p-3 rounded" style="height: 500px; overflow-y: auto; font-family: monospace; white-space: pre-wrap;" id="logsContainer">
+                        {% if logs %}
+                            {{ logs|safe }}
+                        {% else %}
+                            <div class="text-center text-muted">No logs available</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="{{ url_for('docker.containers') }}" class="btn btn-secondary">
+                            <i class="bi bi-box me-1"></i>All Containers
+                        </a>
+                    </div>
+                    <div>
+                        {% if container.status == 'running' %}
+                        <form method="POST" action="{{ url_for('docker.stop_container', container_id=container.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-stop-circle me-1"></i>Stop
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('docker.restart_container', container_id=container.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Restart
+                            </button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('docker.start_container', container_id=container.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-play-circle me-1"></i>Start
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logsContainer = document.getElementById('logsContainer');
+    const refreshLogsBtn = document.getElementById('refreshLogsBtn');
+    const scrollToBottomBtn = document.getElementById('scrollToBottomBtn');
+    const autoRefreshSwitch = document.getElementById('autoRefreshSwitch');
+    let autoRefreshInterval;
+
+    // Scroll to bottom initially
+    logsContainer.scrollTop = logsContainer.scrollHeight;
+
+    // Refresh logs function
+    function refreshLogs() {
+        fetch(window.location.href)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newLogs = doc.getElementById('logsContainer').innerHTML;
+                logsContainer.innerHTML = newLogs;
+                logsContainer.scrollTop = logsContainer.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error refreshing logs:', error);
+            });
+    }
+
+    // Scroll to bottom function
+    function scrollToBottom() {
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+
+    // Event listeners
+    refreshLogsBtn.addEventListener('click', refreshLogs);
+    scrollToBottomBtn.addEventListener('click', scrollToBottom);
+    
+    // Auto-refresh toggle
+    autoRefreshSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            autoRefreshInterval = setInterval(refreshLogs, 5000);
+        } else {
+            clearInterval(autoRefreshInterval);
+        }
+    });
+});
+</script>
+{% endblock %} 

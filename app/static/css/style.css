@@ -1,0 +1,127 @@
+/* Custom styles for Docker Container Manager */
+
+/* General styles */
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Card styles */
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    border-top-left-radius: 0.5rem !important;
+    border-top-right-radius: 0.5rem !important;
+}
+
+/* Container status badges */
+.badge {
+    font-size: 0.8rem;
+    padding: 0.35em 0.65em;
+}
+
+/* Chart containers */
+.container-stats-chart,
+.image-stats-chart,
+.resource-stats-chart {
+    height: 200px;
+    width: 200px;
+}
+
+/* Logs container */
+.logs-container {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Form styles */
+.form-control:focus,
+.form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+/* Button styles */
+.btn-group-sm > .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group-sm > .btn:last-child {
+    margin-right: 0;
+}
+
+/* Navbar styles */
+.navbar-brand {
+    font-weight: 600;
+}
+
+.nav-link {
+    padding: 0.5rem 1rem;
+}
+
+/* Table styles */
+.table th {
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container-stats-chart,
+    .image-stats-chart,
+    .resource-stats-chart {
+        height: 150px;
+        width: 150px;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Animation for refresh button */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.btn:active .bi-arrow-clockwise {
+    animation: spin 1s linear;
+}
+
+/* Custom scrollbar for logs */
+.logs-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.logs-container::-webkit-scrollbar-track {
+    background: #343a40;
+}
+
+.logs-container::-webkit-scrollbar-thumb {
+    background-color: #6c757d;
+    border-radius: 4px;
+}
+
+.logs-container::-webkit-scrollbar-thumb:hover {
+    background-color: #5a6268;
+} 

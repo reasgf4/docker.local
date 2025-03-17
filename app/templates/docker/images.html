@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0"><i class="bi bi-layers me-2"></i>Docker Images</h4>
+                <div>
+                    <button class="btn btn-light btn-sm" disabled>
+                        <i class="bi bi-cloud-download me-1"></i>Pull Image
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Repository</th>
+                                <th>Tag</th>
+                                <th>Size</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for image in images %}
+                            <tr>
+                                <td>{{ image.short_id.split(':')[1] }}</td>
+                                <td>
+                                    {% if image.tags %}
+                                        {% for tag in image.tags %}
+                                            {% set parts = tag.split(':') %}
+                                            {{ parts[0] }}<br>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">&lt;none&gt;</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if image.tags %}
+                                        {% for tag in image.tags %}
+                                            {% set parts = tag.split(':') %}
+                                            {% if parts|length > 1 %}
+                                                {{ parts[1] }}<br>
+                                            {% else %}
+                                                latest<br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">&lt;none&gt;</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% set size_mb = (image.attrs.Size / 1024 / 1024) | round(2) %}
+                                    {% if size_mb > 1000 %}
+                                        {{ (size_mb / 1024) | round(2) }} GB
+                                    {% else %}
+                                        {{ size_mb }} MB
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% set created = image.attrs.Created.split('T')[0] %}
+                                    {{ created }}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-primary" disabled title="Create Container">
+                                            <i class="bi bi-box"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger" disabled title="Remove Image">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No images found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Total: {{ images|length }} image(s)</span>
+                    <button id="refreshBtn" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+        window.location.reload();
+    });
+});
+</script>
+{% endblock %} 

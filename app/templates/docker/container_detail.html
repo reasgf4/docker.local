@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="bi bi-box me-2"></i>Container: {{ container.name }}
+                    <span class="badge {% if container.status == 'running' %}bg-success{% elif container.status == 'paused' %}bg-warning{% else %}bg-danger{% endif %} ms-2">
+                        {{ container.status }}
+                    </span>
+                </h4>
+                <div>
+                    <a href="{{ url_for('docker.containers') }}" class="btn btn-light btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Containers
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="border-bottom pb-2">Container Information</h5>
+                        <table class="table">
+                            <tr>
+                                <th style="width: 30%">ID</th>
+                                <td>{{ container.id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ container.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Image</th>
+                                <td>{{ container.image.tags[0] if container.image.tags else container.image.short_id }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    <span class="badge {% if container.status == 'running' %}bg-success{% elif container.status == 'paused' %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ container.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Created</th>
+                                <td>{{ container.attrs.Created }}</td>
+                            </tr>
+                            <tr>
+                                <th>Platform</th>
+                                <td>{{ container.attrs.Platform if container.attrs.Platform else 'N/A' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="border-bottom pb-2">Network & Resources</h5>
+                        <table class="table">
+                            <tr>
+                                <th style="width: 30%">Ports</th>
+                                <td>
+                                    {% if container.ports %}
+                                        {% for port, mappings in container.ports.items() %}
+                                            {% if mappings %}
+                                                {% for mapping in mappings %}
+                                                    {{ mapping['HostIp'] or '0.0.0.0' }}:{{ mapping['HostPort'] }} -> {{ port }}<br>
+                                                {% endfor %}
+                                            {% else %}
+                                                {{ port }}<br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Networks</th>
+                                <td>
+                                    {% if container.attrs.NetworkSettings.Networks %}
+                                        {% for network_name, network in container.attrs.NetworkSettings.Networks.items() %}
+                                            <div>{{ network_name }}: {{ network.IPAddress }}</div>
+                                        {% endfor %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>CPU Shares</th>
+                                <td>{{ container.attrs.HostConfig.CpuShares if container.attrs.HostConfig.CpuShares else 'Default' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Memory Limit</th>
+                                <td>
+                                    {% if container.attrs.HostConfig.Memory and container.attrs.HostConfig.Memory > 0 %}
+                                        {{ (container.attrs.HostConfig.Memory / (1024*1024))|round|int }} MB
+                                    {% else %}
+                                        Unlimited
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Restart Policy</th>
+                                <td>{{ container.attrs.HostConfig.RestartPolicy.Name if container.attrs.HostConfig.RestartPolicy.Name else 'none' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5 class="border-bottom pb-2">Environment Variables</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if container.attrs.Config.Env %}
+                                        {% for env in container.attrs.Config.Env %}
+                                            {% set env_parts = env.split('=', 1) %}
+                                            <tr>
+                                                <td>{{ env_parts[0] }}</td>
+                                                <td>{{ env_parts[1] if env_parts|length > 1 else '' }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="2" class="text-center">No environment variables</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5 class="border-bottom pb-2">Volumes</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Host Path</th>
+                                        <th>Container Path</th>
+                                        <th>Mode</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if container.attrs.Mounts %}
+                                        {% for mount in container.attrs.Mounts %}
+                                            <tr>
+                                                <td>{{ mount.Source }}</td>
+                                                <td>{{ mount.Destination }}</td>
+                                                <td>{{ mount.Mode }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="3" class="text-center">No volumes mounted</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a href="{{ url_for('docker.container_logs', container_id=container.id) }}" class="btn btn-info">
+                            <i class="bi bi-journal-text me-1"></i>View Logs
+                        </a>
+                    </div>
+                    <div>
+                        {% if container.status == 'running' %}
+                        <form method="POST" action="{{ url_for('docker.stop_container', container_id=container.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-stop-circle me-1"></i>Stop
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('docker.restart_container', container_id=container.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Restart
+                            </button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('docker.start_container', container_id=container.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-play-circle me-1"></i>Start
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% if current_user.is_admin %}
+                        <form method="POST" action="{{ url_for('docker.remove_container', container_id=container.id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to remove this container?');">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-1"></i>Remove
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

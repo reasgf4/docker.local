@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Create Container</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('docker.create_container') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.name.label(class="form-label") }}
+                                {% if form.name.errors %}
+                                    {{ form.name(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.name(class="form-control") }}
+                                {% endif %}
+                                <div class="form-text">A unique name for your container</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.image.label(class="form-label") }}
+                                {% if form.image.errors %}
+                                    {{ form.image(class="form-select is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.image.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.image(class="form-select") }}
+                                {% endif %}
+                                <div class="form-text">Select the Docker image to use</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.ports.label(class="form-label") }}
+                                {% if form.ports.errors %}
+                                    {{ form.ports(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.ports.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.ports(class="form-control") }}
+                                {% endif %}
+                                <div class="form-text">Format: host_port:container_port (e.g., 8080:80,8443:443)</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.environment.label(class="form-label") }}
+                                {% if form.environment.errors %}
+                                    {{ form.environment(class="form-control is-invalid", rows=4) }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.environment.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.environment(class="form-control", rows=4) }}
+                                {% endif %}
+                                <div class="form-text">Format: KEY1=value1,KEY2=value2</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('docker.containers') }}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle me-1"></i>Cancel
+                        </a>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Container Creation Help</h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="helpAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                                Container Name
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <p>The container name must be unique and can only contain letters, numbers, underscores, dots, and hyphens.</p>
+                                <p>Examples:</p>
+                                <ul>
+                                    <li>web-server</li>
+                                    <li>mysql_db</li>
+                                    <li>redis.cache</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                                Port Mappings
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <p>Port mappings allow you to map container ports to host ports. Format: <code>host_port:container_port</code></p>
+                                <p>Examples:</p>
+                                <ul>
+                                    <li><code>8080:80</code> - Maps container port 80 to host port 8080</li>
+                                    <li><code>3306:3306</code> - Maps container port 3306 to host port 3306</li>
+                                    <li><code>8080:80,8443:443</code> - Maps multiple ports</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                                Environment Variables
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                            <div class="accordion-body">
+                                <p>Environment variables are passed to the container. Format: <code>KEY=value</code></p>
+                                <p>Examples:</p>
+                                <ul>
+                                    <li><code>MYSQL_ROOT_PASSWORD=secret</code></li>
+                                    <li><code>POSTGRES_USER=admin,POSTGRES_PASSWORD=secret</code></li>
+                                    <li><code>DEBUG=true,LOG_LEVEL=info</code></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
